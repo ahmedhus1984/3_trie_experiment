@@ -1,0 +1,44 @@
+While performing the delete operation, we will be deleting the key using recursion in a bottom-up way.
+###
+
+
+
+1.
+word doesn't exist:
+
+The first case will be to check if the key exists or not in the trie data structure. We have to make sure that deleting nodes from trie should not modify the trie.
+
+For example:
+WORDS: [“apple”, “ball”, “car”, “dog”, “dogecoin”, “carter”, “balling”]
+
+We want to delete the string “best”.
+We will search for the word “best” in the trie, but since it does not exist, hence no deletion will occur.
+###
+
+2.
+unique word:
+
+The second case is that the key should be unique, i.e., no part of the key should contain any other key, nor the key itself will have another key. Then we can delete all the nodes.
+For example, we can delete “apple” as it is a unique key.
+###
+
+3.
+word is prefix:
+
+The third case is when the key itself is a prefix of another key in the trie data structure. (Prefix case)
+For example, we want to delete “car” but “car” is also present in “carter”. Hence, we will update the leaf node boolean value “true” to ”false” for the string “car”. 
+###
+
+4.
+word has prefix(s) but is not shared
+The fourth case is when the key we are deleting has another key as its prefix.
+ 
+For example, we want to delete “balling”. So we can delete all the nodes from the bottom till we reach the leaf node for the word “ball”. Hence, we will delete 3 characters “g”, “n” and then “i”. 
+###
+
+5.
+not sure!!
+The fifth case is when a node has prefix and is later on shared with other words. 
+
+For example, we want to delete the word “dogecoin” which is also a part of “dog”. We will check if any other children are there in “d”; there is one child; hence, we move on to “o”, we notice that it is common for “dog” too. Here we will delete the remaining nodes “e”, “c”, ”o”, ”i” and ”n”; hence, the word “dogecoin” is deleted.
+###  

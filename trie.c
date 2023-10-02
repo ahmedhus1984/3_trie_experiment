@@ -63,21 +63,22 @@ int main(int argc, char *argv[]){
       return 1;
   }
   //insert
-  insert(root, "parse");
+  insert(root, "erase");
   insert(root, "pear");
+  insert(root, "pears");
   insert(root, "rapper");
-  insert(root, "raper");
   insert(root, "rape");
   insert(root, "rap");
   insert(root, "rapist");
   insert(root, "reap");
   insert(root, "spare");
   insert(root, "spear");
+
   //search
-  search(root, "parse");
+  search(root, "erase");
   search(root, "pear");
+  search(root, "pears");
   search(root, "rapper");
-  search(root, "raper");
   search(root, "rape");
   search(root, "rap");
   search(root, "rapist");
@@ -88,11 +89,27 @@ int main(int argc, char *argv[]){
   //print entire trie
   print_entire_trie_manager(root);
 
-  //delete(root, "do");
-  //delete(root, "trie");
-  //delete(root, "ca");
+  //delete
+
+  //1. delete non-existent word
+  //delete(root, "arse");
+
+  //2. delete unique word
+  //delete(root, "erase");
+
+  //3. delete a word which is a prefix
+  //delete(root, "rap");
+
+  //4. delete a word which has a prefix but is not shared
+  //delete(root, "pears");
+
+  //5. delete a word which has a prefix and is shared
+  //delete(root, "rapper");
 
   //print_entire_trie(root);
+
+  //print entire trie
+  print_entire_trie_manager(root);
 
   //free entire trie
   free_trie(root);
@@ -256,9 +273,10 @@ void reset_isRead_key(trie *head){
   trie* curr=head;
   for(int i=0; i<CHAR_SIZE; i++){
       if(curr->child[i]!=NULL){
-          curr->isRead=false;
+        reset_isRead_key(curr->child[i]);
       }
   }
+  curr->isRead=false;
 }
 
 
