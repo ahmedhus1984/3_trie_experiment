@@ -54,7 +54,7 @@ void print_entire_trie_manager(trie *head);
 char* print_entire_trie(trie *head, char[], int);
 void reset_isRead_key(trie *head);
 bool isNull(trie *head);
-bool delete(trie *head, char *str);
+trie* delete(trie *head, char *str);
 void free_trie(trie *head);
 
 int main(int argc, char *argv[]){
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
       return 1;
   }
   //insert
-  insert(root, "erase");
+  insert(root, "er");
   insert(root, "pear");
   insert(root, "pears");
   insert(root, "rapper");
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]){
   insert(root, "spear");
 
   //search
-  search(root, "erase");
+  search(root, "er");
   search(root, "pear");
   search(root, "pears");
   search(root, "rapper");
@@ -92,19 +92,19 @@ int main(int argc, char *argv[]){
   //delete
 
   //1. delete non-existent word
-  //delete(root, "arse");
+  delete(root, "beras");
 
   //2. delete unique word
-  //delete(root, "erase");
+  delete(root, "er");
 
   //3. delete a word which is a prefix
-  //delete(root, "rap");
+  delete(root, "rap");
 
   //4. delete a word which has a prefix but is not shared
-  //delete(root, "pears");
+  delete(root, "pears");
 
   //5. delete a word which has a prefix and is shared
-  //delete(root, "rapper");
+  delete(root, "rapper");
 
   //print_entire_trie(root);
 
@@ -189,15 +189,10 @@ bool search(trie *head, char *str){
         printf("\nyou have entered a word with invalid character, \'%c\'.\nunable to search for the word, \"%s\".\nplease enter only a, e, p, r or s\n\n", *str, cpy);
         return false;
       }
-      if (curr->child[a]!=NULL){
+      else{
           printf("%c", *str);
           curr=curr->child[a];
           str++;
-      }
-      else{
-          printf("\nword %s not found", cpy);
-          printf("\nsearch return: %d\n\n", b);
-          return b;
       }
   }
   b=curr->isWord;
@@ -207,7 +202,7 @@ bool search(trie *head, char *str){
   else{
       printf("\nword %s not found", cpy);
   }
-  printf("\nsearch return: %d\n\n", b);
+  printf("\n\nsearch return: %d\n", b);
   return b;
 }
 
@@ -215,17 +210,15 @@ bool isNull(trie *head){
   trie *curr=head;
   for(int i=0; i<CHAR_SIZE; i++){
       if(curr->child[i]!=NULL){
-          // printf("node continues\n");
-          return 0;
+          return false;
       }
   }
-  // printf("all nodes are null!!!\n");
-  return 1;
+  return true;
 }
 
 void print_entire_trie_manager(trie *head){
   trie *curr=head;
-  printf("printing the entire trie tree: \n");
+  printf("\nprinting the entire trie tree: \n");
   char *a=calloc(2, sizeof(char));
   if(a==NULL){
     printf("unable to allocate memory in function print_entire_trie_manager\n");
@@ -238,6 +231,7 @@ void print_entire_trie_manager(trie *head){
   }
   free(a);
   reset_isRead_key(head);
+  printf("\n");
 }
 
 char* print_entire_trie(trie *head, char *p2, int p3){
@@ -280,45 +274,40 @@ void reset_isRead_key(trie *head){
 }
 
 
-// bool delete(trie *head, char *str){
-//   if(head==NULL){
-//       return false;
-//   }
-//   trie* curr=head;
-//   bool a=false;
-//   while(*str){
-//       if (curr->child[*str-'a']!=NULL){
-//           printf("%c\n", *str);
-//           str++;
-//           a=delete(curr->child[*str-'a'], str);
-//       }
-//       else{
-//           printf("word not found\n");
-//           return false;
-//       }
-//   }
-//   a=curr->isWord;
-//   if(a){
-//       printf("word found, checking if last-letter node, %c is pointing to any nodes with values...\n", *str);
-//       if(isNull(curr)){
-//           printf("last-letter node %c is not pointing to any further nodes! deleting last-letter node and setting it to null...", *str);
-//           free(curr);
-//           curr=NULL;
-//           printf("deleted last node %c and set to null!!!", *str);
+trie* delete(trie *head, char *str){
+  trie *curr=head;
+  char *ptr=str;
+  int length=strlen(ptr);
+  if(length==0){
+    if(curr->isWord){
+      curr->isWord=false;
+      if(isNull(curr)){
+        free(curr);
+        curr=NULL;
+      }
+      printf("deleted!!\n");
+    }
+    else{
+      printf("unable to delete, word not found int trie!!!\n");
+    }
+  }
+  else{
+    int c_to_i=lookup_char(ptr[0]);
+    if(c_to_i!=-1){
+        if(curr->child[c_to_i]!=NULL){
+          curr->child[c_to_i]=delete(curr->child[c_to_i], ++ptr);
+        }
+        else{
+          printf("unable to delete, word not found int trie!!!\n");
+        }
+    }
+    else{
+        printf("unable to delete, word not found int trie!!!\n");
+    }
 
-//       }
-//       else{
-//           printf("last-letter node %c is pointing to at least one node with value, removing leaf-node attribute from last-letter node %c without deleting it...", *str, *str);
-//           curr->isWord=false;
-//       }
-//       printf("leaf-node attribute for %c removed, deletion success...", *str);
-//   }
-//   else{
-//       printf("word not found\n");
-//   }
-//   printf("search return: %d\n", a);
-//   return a;
-// }
+  }
+  return curr;
+}
 
 void free_trie(trie *head){
   if(head==NULL){
