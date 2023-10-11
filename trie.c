@@ -25,7 +25,6 @@ void print_entire_trie_manager(trie *head);
 char* print_entire_trie(trie *head, char[], int);
 void reset_isRead_key(trie *head);
 bool isNull(trie *head);
-void delete_manager(trie *head, char *str);
 trie* delete(trie *head, char *str_immut, char *str);
 void free_trie(trie *head);
 
@@ -35,90 +34,68 @@ int main(int argc, char *argv[]){
       return 1;
   }
   //insert, search, delete from and print, free entire trie:
-  // insert(root, "car");
-  // insert(root, "cat");
+  insert(root, "car");
+  insert(root, "cat");
   insert(root, "ba");
-  // insert(root, "do");
-  // insert(root, "done");
-  // insert(root, "taken");
-  // insert(root, "trie");
-  // insert(root, "tried");
-  // insert(root, "troll");
-  // insert(root, "tromso");
-  // insert(root, "try");
-  // insert(root, "umbrella");
+  insert(root, "do");
+  insert(root, "done");
+  insert(root, "Gondola");
+  insert(root, "taken");
+  insert(root, "trie");
+  insert(root, "tried");
+  insert(root, "troll");
+  insert(root, "tromso");
+  insert(root, "try");
+  insert(root, "umbrella");
   
-
+  search(root, "ca");
+  search(root, "car");
+  search(root, "cat");
   search(root, "ba");
-  // search(root, "ca");
-  // search(root, "car");
-  // search(root, "card");
-  // search(root, "cat");
-  // search(root, "do");
-  // search(root, "done");
-  // search(root, "taken");
-  // search(root, "trie");
-  // search(root, "tried");
-  // search(root, "troll");
-  // search(root, "tromso");
-  // search(root, "try");
-  // search(root, "umbrella");
-  // search(root, "zebra");
+  search(root, "do");
+  search(root, "done");
+  search(root, "Gondola");
+  search(root, "taken");
+  search(root, "trie");
+  search(root, "tried");
+  search(root, "troll");
+  search(root, "tromso");
+  search(root, "try");
+  search(root, "umbrella");
+  search(root, "zebra");
 
-  // print_entire_trie_manager(root);
-
-  //delete_manager(root, "do");
-  //delete_manager(root, "trie");
-  //delete_manager(root, "ca");
-
-  // //print entire trie
-  // print_entire_trie_manager(root);
+  //print entire trie
+  print_entire_trie_manager(root);
 
   // //delete
 
   // //1. delete non-existent word
-  // delete_manager(root, "Gondola");
-  // delete_manager(root, "grandpa");
+  delete(root, "Gondola", "Gondola");
+  delete(root, "grandpa", "grandpa");
+  delete(root, "tr", "tr");
+  delete(root, "tri", "tri");
 
   // 2. delete unique word
-  delete_manager(root, "ba");
+  delete(root, "ba", "ba");
 
   // //3. delete a word which is a prefix
-  // delete_manager(root, "rap");
+  delete(root, "do", "do");
 
-  // //4. delete a word which has a prefix but is not shared
-  // delete_manager(root, "pears");
+  //4. delete a word which has a prefix but is not shared (other than the 2 words, 'do' & 'done', no other words have a prefix of 'do')
+  delete(root, "done", "done");
 
-  // //5. delete a word which has a prefix and is shared
-  // delete_manager(root, "rapper");
+  //5. delete a word which has a prefix and is shared (the prefix, 'tr' is shared by 5 words, 'trie', 'tried', 'troll', 'tromso' & 'try')
+  delete(root, "tromso", "tromso");
 
-  // //print entire trie
-  // print_entire_trie_manager(root);
+  //print entire trie
+  print_entire_trie_manager(root);
 
-  //free entire trie
-  // free_trie(root);
+  // free entire trie
+  free_trie(root);
+  // free(root);
 
   return 0;
 }
-
-// //test5
-// int lookup_char(char p1){
-//   char blah[CHAR_SIZE]={'a', 'e', 'p', 'r', 's'};
-//   for(int i=0; i<CHAR_SIZE; i++){
-//     if(blah[i]==p1){
-//       return i;
-//     }
-//   }
-//   return -1;
-// }
-
-// char lookup_int(int p1){
-//   char blah[CHAR_SIZE]={'a', 'e', 'p', 'r', 's'};
-//   if(p1>=0 && p1<=CHAR_SIZE){
-//     return blah[p1];
-//   }
-//   return '\0';
-// }
 
 // Function that returns a new Trie node
 trie* createTrieNode(){
@@ -141,20 +118,16 @@ bool insert(trie *head, char *str){
   char cpy[a];
   strcpy(cpy, str);
   while (*str){
-      if(*str<=96 || *str>=122){
-        printf("you have entered a word with invalid character, \'%c\'.\nunable to insert the word, \"%s\".\nplease enter only small-lettered alphabets\n\n", *str, cpy);
-        return false;
-      }
-      int b=*str-97;
-      if(curr->child[b]==NULL){
-          curr->child[b]=createTrieNode();
-          printf("letter %c inserted into trie\n", *str);
-      }
-      else{
-        printf("letter %c exists in trie\n", *str);
-      }
-      curr = curr->child[b];
-      str++;
+    if(*str<97 || *str>122){
+      printf("unable to insert the word, \"%s\".\nyou have entered a word with invalid character, \'%c\'.\nplease enter only small-lettered alphabets\n\n", cpy, *str);
+      return false;
+    }
+    int b=*str-97;
+    if(curr->child[b]==NULL){
+        curr->child[b]=createTrieNode();
+    }
+    curr = curr->child[b];
+    str++;
   }
   curr->isWord=1;
   printf("word %s has been added into trie\n\n", cpy);
@@ -168,16 +141,15 @@ bool search(trie *head, char *str){
   strcpy(cpy, str);
   bool b=false;
   while(*str){
-      if(*str<=96 || *str>=122){
-        printf("\nyou have entered a word with invalid character, \'%c\'.\nunable to search for the word, \"%s\".\nplease enter only small-lettered alphabets\n\n", *str, cpy);
+      if(*str<97 || *str>122){
+        printf("\nunable to search for the word, \"%s\".\nyou have entered a word with invalid character, \'%c\'.\nplease enter only small-lettered alphabets\n", cpy, *str);
         return false;
       }
       else{
-          printf("%c\n", *str);
           curr=curr->child[(*str-97)];
           if(curr==NULL){
             printf("\nword \"%s\" not found in trie", cpy);
-            printf("\nsearch return: %d\n\n", b);
+            printf("\nsearch return: %d\n", b);
             return b;
           }
           str++;
@@ -190,7 +162,7 @@ bool search(trie *head, char *str){
   else{
       printf("\nword \"%s\" not found in trie", cpy);
   }
-  printf("\nsearch return: %d\n\n", b);
+  printf("\nsearch return: %d\n", b);
   return b;
 }
 
@@ -240,7 +212,6 @@ char* print_entire_trie(trie *head, char *p2, int p3){
         p2[p3]=97+i;
         p3++;
         p2=realloc(p2, p3+2);
-        // *(p2+(p3+1))='\0';
         p2=print_entire_trie(curr->child[i], p2, p3);
         p3--;
       }
@@ -261,48 +232,39 @@ void reset_isRead_key(trie *head){
   curr->isRead=false;
 }
 
-void delete_manager(trie *head, char *str){
-  delete(head, str, str);
-  return;
-}
-
 trie* delete(trie *head, char *str_immut, char *str){
-  trie *curr=head;
-  if(curr==NULL){
-    return curr;
+  if(head==NULL){
+    return head;
   }
   int length=strlen(str);
   if(length==0){
-    if(curr->isWord){
-      curr->isWord=false;
+    if(head->isWord){
+      head->isWord=false;
+      if(isNull(head)){
+        free(head);
+        head=NULL;
+      }
     }
     else{
-      printf("unable to delete, word not found int trie!!!\n");
+      printf("unable to delete \"%s\", word not found int trie!!!\n\n", str_immut);
     }
   }
   else{
-    if(*str<=96 || *str>=122){
-      printf("\nyou have entered a word with invalid character, \'%c\'.\nunable to delete the word, \"%s\".\nplease enter only small-lettered alphabets\n\n", *str, str_immut);
-      return curr;
+    if(*str<97 || *str>122){
+        printf("\nunable to delete the word, \"%s\".\nyou have entered a word with invalid character, \'%c\'.\nplease enter only small-lettered alphabets\n\n", str_immut, *str);
+      return head;
     }
     else{
-        if(curr->child[(*str-97)]!=NULL){
-          printf("deleting \'%c\'\n", *str);
-          char a=str[0];
-          str++;
-          curr->child[(*str-97)]=delete(curr->child[(*str-97)], str_immut, str);
-          printf("deleted \'%c\'!!\n", a);
-        }
-        else{
-          printf("unable to delete \"%s\", word not found int trie!!!\n", str_immut);
-        }
+      int a=*str-97;
+      if(head->child[a]!=NULL){
+        head->child[a]=delete(head->child[a], str_immut, ++str);
+      }
+      else{
+        printf("unable to delete \"%s\", word not found int trie!!!\n\n", str_immut);
+      }
     }
   }
-  if(isNull(curr)){
-    free(curr);
-    curr=NULL;
-  }
-  return curr;
+  return head;
 }
 
 void free_trie(trie *head){
