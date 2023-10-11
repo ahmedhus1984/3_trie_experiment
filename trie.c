@@ -236,34 +236,29 @@ trie* delete(trie *head, char *str_immut, char *str){
   if(head==NULL){
     return head;
   }
-  int length=strlen(str);
-  if(length==0){
+  if(strlen(str)==0){
     if(head->isWord){
       head->isWord=false;
       if(isNull(head)){
         free(head);
         head=NULL;
       }
-    }
-    else{
-      printf("unable to delete \"%s\", word not found int trie!!!\n\n", str_immut);
+      return head;
     }
   }
   else{
     if(*str<97 || *str>122){
-        printf("\nunable to delete the word, \"%s\".\nyou have entered a word with invalid character, \'%c\'.\nplease enter only small-lettered alphabets\n\n", str_immut, *str);
-      return head;
+        printf("\nunable to delete the word, \"%s\".\nyou have entered a word with invalid character, \'%c\'.\nplease enter only small-lettered alphabets\n", str_immut, *str);
     }
     else{
       int a=*str-97;
       if(head->child[a]!=NULL){
         head->child[a]=delete(head->child[a], str_immut, ++str);
-      }
-      else{
-        printf("unable to delete \"%s\", word not found int trie!!!\n\n", str_immut);
+        return head;
       }
     }
   }
+  printf("unable to delete \"%s\", word not found int trie!!!\n\n", str_immut);
   return head;
 }
 
